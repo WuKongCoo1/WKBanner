@@ -4,7 +4,7 @@
 //
 //  Created by 吴珂 on 15/7/7.
 //  Copyright (c) 2015年 吴珂. All rights reserved.
-//
+//  横幅广告
 
 #import <UIKit/UIKit.h>
 
