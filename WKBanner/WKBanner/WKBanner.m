@@ -144,7 +144,15 @@
 #pragma mark - AutoScroll
 - (void)autoScroll:(NSTimer *)timer
 {
-    
+    if ([self.dataSource numberOfImageInBaner:self] == 0) {
+        return;
+    }else if ([self.dataSource numberOfImageInBaner:self] == 1){
+        self.pageControl.hidden = YES;
+        return;
+    }else{
+        self.pageControl.hidden = NO;
+        [self stopTimer];
+    }
     NSIndexPath *currentIndexPath = [[self.collectionView indexPathsForVisibleItems]lastObject];
     
     NSInteger nextItem = currentIndexPath.item + 1;
@@ -174,6 +182,11 @@
 - (void)addTimer
 {
     _timer = [NSTimer scheduledTimerWithTimeInterval:2.f target:self selector:@selector(autoScroll:) userInfo:nil repeats:YES];
+}
+
+- (void)stopTimer
+{
+    [self.timer invalidate];
 }
 
 - (void)removeTimer
