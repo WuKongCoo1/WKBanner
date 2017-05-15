@@ -27,6 +27,13 @@ typedef NS_ENUM(NSInteger, WKBannerSourceType) {
 - (NSString *)banner:(WKBanner *)banner imageNameWithIndex:(NSInteger)index;
 //URLImage
 - (NSString *)banner:(WKBanner *)banner imageURLWithIndex:(NSInteger)index;
+//titile
+- (NSString *)banner:(WKBanner *)banner titleWithIndex:(NSInteger)index;
+//font
+- (UIFont *)banner:(WKBanner *)banner fontWithIndex:(NSInteger)index;
+
+//占位图名
+- (NSString *)bannerPlaceholder;
 
 @required
 - (NSInteger)numberOfImageInBaner:(WKBanner *)banner;
@@ -39,8 +46,8 @@ typedef NS_ENUM(NSInteger, WKBannerSourceType) {
 @property (strong, nonatomic) NSArray *imageNameArr;
 @property (weak, nonatomic) IBOutlet UIPageControl *pageControl;
 
-@property (assign, nonatomic) id<WKBannerDelegate> delegate;
-@property (assign, nonatomic) id<WKBannerDataSource> dataSource;
+@property (weak, nonatomic) id<WKBannerDelegate> delegate;
+@property (weak, nonatomic) id<WKBannerDataSource> dataSource;
 
 @property (assign, nonatomic) WKBannerSourceType sourceType;
 
@@ -48,4 +55,7 @@ typedef NS_ENUM(NSInteger, WKBannerSourceType) {
 
 + (instancetype)bannerWithFrame:(CGRect)rect;
 
+- (void)stopTimer;
+- (void)startTimer;
+- (void)restartTimer;
 @end

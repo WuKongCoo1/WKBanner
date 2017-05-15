@@ -8,12 +8,12 @@
 
 #import "WKBanner.h"
 #import "WKImageCell.h"
-#import <UIImageView+WebCache.h>
+#import <SDWebImage/UIImageView+WebCache.h>
 
 #define kCycleTimes 10000
 #define kScreenWidth [UIScreen mainScreen].bounds.size.width
 
-@interface WKBanner ()
+@interface WKBanner ()<UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) NSTimer *timer;
 
@@ -36,28 +36,66 @@
 }
 
 - (void)awakeFromNib {
+    [super awakeFromNib];
     //regist cell
     [self.collectionView registerNib:[UINib nibWithNibName:@"WKImageCell" bundle:nil] forCellWithReuseIdentifier:@"WKImageCell"];
     
     self.pageControl.currentPage = 0;
 }
 
-- (void)didMoveToSuperview
+- (void)willMoveToSuperview:(UIView *)newSuperview
 {
+    [super willMoveToSuperview:newSuperview];
+    
+    if (newSuperview == nil) {
+        return;
+    }
+    
     if ([self.dataSource respondsToSelector:@selector(numberOfImageInBaner:)]) {
         NSInteger count = [self.dataSource numberOfImageInBaner:self];
         if (count == 0) {
-            NSAssert(NO, @"图片数量不能为0");
+            //            NSAssert(NO, @"图片数量不能为0");
+        }else{
+            [self addTimer];
+            self.pageControl.numberOfPages = count;
         }
-        self.pageControl.numberOfPages = count;
     }else{
+        
         NSAssert(NO, @"必须实现数据源方法");
     }
     
-    [self addTimer];
+    
     
     self.collectionView.contentSize = CGSizeMake(kCycleTimes * [self.dataSource numberOfImageInBaner:self] * kScreenWidth, self.bounds.size.height);
     [self.collectionView setContentOffset:CGPointMake([UIScreen mainScreen].bounds.size.width * [self.dataSource numberOfImageInBaner:self] * kCycleTimes / 2, 0) animated:NO];
+    
+    id target = self.collectionView.panGestureRecognizer.delegate;
+    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:target action:nil];
+    longPress.delegate = self;
+    [self.collectionView addGestureRecognizer:longPress];
+    
+    
+    
+}
+
+- (void)didMoveToSuperview
+{
+    [super didMoveToSuperview];
+    //    NSLog(@"%@", self.dataSource);
+    //    if ([self.dataSource respondsToSelector:@selector(numberOfImageInBaner:)]) {
+    //        NSInteger count = [self.dataSource numberOfImageInBaner:self];
+    //        if (count == 0) {
+    //            NSAssert(NO, @"图片数量不能为0");
+    //        }
+    //        self.pageControl.numberOfPages = count;
+    //    }else{
+    //        NSAssert(NO, @"必须实现数据源方法");
+    //    }
+    //
+    //    [self addTimer];
+    //
+    //    self.collectionView.contentSize = CGSizeMake(kCycleTimes * [self.dataSource numberOfImageInBaner:self] * kScreenWidth, self.bounds.size.height);
+    //    [self.collectionView setContentOffset:CGPointMake([UIScreen mainScreen].bounds.size.width * [self.dataSource numberOfImageInBaner:self] * kCycleTimes / 2, 0) animated:NO];
 }
 
 
@@ -73,6 +111,7 @@
 {
     WKImageCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"WKImageCell" forIndexPath:indexPath];
     NSInteger imageIndex = 0;
+    [cell scaleAnimationWithTime:1.f];
     
     if ([self.dataSource respondsToSelector:@selector(numberOfImageInBaner:)]) {
         NSInteger numberOfImage = [self.dataSource numberOfImageInBaner:self];
@@ -85,8 +124,10 @@
     switch (self.sourceType) {
         case WKBannerSourceTypeFromLocal: {
             if ([self.dataSource respondsToSelector:@selector(banner:imageNameWithIndex:)]) {
+                NSLog(@"%@", [UIImage imageNamed:[self.dataSource banner:self imageNameWithIndex:imageIndex]]);
                 cell.imageView.image = [UIImage imageNamed:[self.dataSource banner:self imageNameWithIndex:imageIndex]];
             }
+            [self setTitleWithCell:cell index:imageIndex];
             break;
         }
         case WKBannerSourceTypeFromURL: {
@@ -94,8 +135,16 @@
                 
                 NSString *urlStr = [self.dataSource banner:self imageURLWithIndex:imageIndex];
                 
-                [cell.imageView sd_setImageWithURL:[NSURL URLWithString:urlStr] placeholderImage:nil];
+                UIImage *placeholderImage;
+                if ([self.dataSource respondsToSelector:@selector(bannerPlaceholder)]) {
+                    placeholderImage = [UIImage imageNamed:[self.dataSource bannerPlaceholder]];
+                }else{
+                    placeholderImage = [UIImage imageNamed:@"Homework_imgicon"];
+                }
+                
+                [cell.imageView sd_setImageWithURL:[NSURL URLWithString:urlStr] placeholderImage:placeholderImage];
             }
+            [self setTitleWithCell:cell index:imageIndex];
             break;
         }
         default: {
@@ -125,7 +174,7 @@
     NSLog(@"点击index:%lu", currentPage);
     
     if ([self.delegate respondsToSelector:@selector(banner:selectedIndex:)]) {
-        [self.delegate banner:self selectedIndex:indexPath.row];
+        [self.delegate banner:self selectedIndex:currentPage];
     }
 }
 
@@ -134,10 +183,35 @@
     if ((int)scrollView.contentOffset.x % (int)self.bounds.size.width == 0) {
         
         NSUInteger page = scrollView.contentOffset.x / self.bounds.size.width;
+        NSInteger currentPage = 1;
+        if ([self.dataSource respondsToSelector:@selector(numberOfImageInBaner:)]) {
+            if ([self.dataSource numberOfImageInBaner:self] != 0) {
+                currentPage = page % [self.dataSource numberOfImageInBaner:self];
+            }
+            
+        }else{
+            return;
+        }
         
-        NSInteger currentPage = page % [self.dataSource numberOfImageInBaner:self];
+        
         
         self.pageControl.currentPage = currentPage;
+    }
+}
+
+
+- (void)setTitleWithCell:(WKImageCell *)cell index:(NSInteger)imageIndex
+{
+    if ([self.dataSource respondsToSelector:@selector(banner:titleWithIndex:)]) {
+        cell.titleLabel.text = [self.dataSource banner:self titleWithIndex:imageIndex];
+        cell.titleLabelRight.constant = self.pageControl.bounds.size.width + 10;
+        [cell layoutIfNeeded];
+    }
+    
+    [cell setTitle:cell.titleLabel.text];
+    
+    if ([self.dataSource respondsToSelector:@selector(banner:fontWithIndex:)]) {
+        cell.titleLabel.font = [self.dataSource banner:self fontWithIndex:imageIndex];
     }
 }
 
@@ -151,9 +225,15 @@
         return;
     }else{
         self.pageControl.hidden = NO;
-        [self stopTimer];
+        //        [self stopTimer];
     }
+    
+    
+    
     NSIndexPath *currentIndexPath = [[self.collectionView indexPathsForVisibleItems]lastObject];
+    if (currentIndexPath == nil) {
+        return;
+    }
     
     NSInteger nextItem = currentIndexPath.item + 1;
     NSInteger section = currentIndexPath.section;
@@ -171,7 +251,8 @@
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
-    [self removeTimer];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stopTimer) object:nil];
+    [self stopTimer];
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
@@ -181,7 +262,19 @@
 
 - (void)addTimer
 {
-    _timer = [NSTimer scheduledTimerWithTimeInterval:2.f target:self selector:@selector(autoScroll:) userInfo:nil repeats:YES];
+    if (self.timer) {
+        [self.timer invalidate];
+        self.timer = nil;
+    }
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:5.f target:self selector:@selector(autoScroll:) userInfo:nil repeats:YES];
+    
+    [[NSRunLoop currentRunLoop] addTimer:_timer forMode:UITrackingRunLoopMode];
+}
+
+
+- (void)setupCollectionView
+{
+    [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:(kCycleTimes / 2 * [self.dataSource numberOfImageInBaner:self]) inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
 }
 
 - (void)stopTimer
@@ -189,14 +282,44 @@
     [self.timer invalidate];
 }
 
-- (void)removeTimer
+- (void)restartTimer
 {
-    [_timer invalidate];
+    [self addTimer];
 }
 
-- (void)setupCollectionView
+- (void)startTimer
 {
-    [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:(kCycleTimes / 2 * [self.dataSource numberOfImageInBaner:self]) inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
+    
+    [self stopTimer];
+    self.pageControl.numberOfPages = [self.dataSource numberOfImageInBaner:self];
+    if ([self.dataSource numberOfImageInBaner:self] == 0) {
+        return;
+    }
+    [self.collectionView reloadData];
+    [self.collectionView setContentOffset:CGPointMake([UIScreen mainScreen].bounds.size.width * [self.dataSource numberOfImageInBaner:self] * kCycleTimes / 2, 0) animated:NO];
+    [self addTimer];
+    
+}
+
+- (void)dealloc
+{
+    [self stopTimer];
+}
+
+- (void)setTimer:(NSTimer *)timer
+{
+    if (_timer) {
+        [_timer invalidate];
+    }
+    _timer = timer;
+}
+
+#pragma mark -
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    [self stopTimer];
+    return NO;
 }
 
 @end

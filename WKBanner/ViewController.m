@@ -60,6 +60,17 @@
     return _imageUrlArr[index];
 }
 
+//titile
+- (NSString *)banner:(WKBanner *)banner titleWithIndex:(NSInteger)index
+{
+    return [NSString stringWithFormat:@"第%li张图片", (long)index + 1];
+}
+//font
+- (UIFont *)banner:(WKBanner *)banner fontWithIndex:(NSInteger)index
+{
+    return [UIFont systemFontOfSize:14.f];
+}
+
 - (NSInteger)numberOfImageInBaner:(WKBanner *)banner
 {
     if (banner == _banner) {

@@ -1,7 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16D30" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -12,6 +16,7 @@
             <subviews>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="B1F-d5-LgS">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="126"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="dDx-1O-C2z">
                         <size key="itemSize" width="320" height="60"/>
                         <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -24,23 +29,22 @@
                     </connections>
                 </collectionView>
                 <pageControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="3" translatesAutoresizingMaskIntoConstraints="NO" id="gbr-LD-rFx">
-                    <rect key="frame" x="250" y="89" width="70" height="37"/>
+                    <rect key="frame" x="276" y="93" width="39" height="33"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="37" id="WXi-jt-PU4"/>
-                        <constraint firstAttribute="width" constant="70" id="Whp-GB-cmR"/>
+                        <constraint firstAttribute="height" constant="33" id="WXi-jt-PU4"/>
                     </constraints>
-                    <color key="pageIndicatorTintColor" red="0.75686274509999996" green="0.75686274509999996" blue="0.75686274509999996" alpha="1" colorSpace="calibratedRGB"/>
-                    <color key="currentPageIndicatorTintColor" red="0.25882352939999997" green="0.69019607839999997" blue="0.81176470590000005" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="pageIndicatorTintColor" red="0.75686274509999996" green="0.75686274509999996" blue="0.75686274509999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <color key="currentPageIndicatorTintColor" red="0.25882352939999997" green="0.69019607839999997" blue="0.81176470590000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 </pageControl>
             </subviews>
-            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="B1F-d5-LgS" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="4hC-U8-mha"/>
                 <constraint firstAttribute="bottom" secondItem="gbr-LD-rFx" secondAttribute="bottom" id="PLG-Qj-o0q"/>
                 <constraint firstAttribute="trailing" secondItem="B1F-d5-LgS" secondAttribute="trailing" id="YXr-zc-G2i"/>
                 <constraint firstAttribute="bottom" secondItem="B1F-d5-LgS" secondAttribute="bottom" id="hMD-b9-CN4"/>
                 <constraint firstItem="B1F-d5-LgS" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="iTr-hB-gXI"/>
-                <constraint firstAttribute="trailing" secondItem="gbr-LD-rFx" secondAttribute="trailing" id="vf8-1b-ZJU"/>
+                <constraint firstAttribute="trailing" secondItem="gbr-LD-rFx" secondAttribute="trailing" constant="5" id="vf8-1b-ZJU"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
